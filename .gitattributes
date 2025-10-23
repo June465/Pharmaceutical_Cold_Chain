@@ -1,2 +1,35 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*build/
+*dist/
+*.egg-info/
+venv/
+.venv/
+env/
+ENV/
+
+# Docker
+.dockerignore
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json # Optional, but good to ignore if team uses different OS
+
+# IDE / Editor specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Project Specific Data
+/data/
