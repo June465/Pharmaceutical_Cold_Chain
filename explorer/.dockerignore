@@ -1,0 +1,10 @@
+# explorer/.dockerignore
+
+# Node.js dependencies
+node_modules
+
+# Build output
+build
+
+# Log files
+npm-debug.log

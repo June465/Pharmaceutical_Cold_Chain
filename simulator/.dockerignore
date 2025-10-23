@@ -1,0 +1,10 @@
+# simulator/.dockerignore
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Local virtual environment
+venv/
+.venv/
+env/

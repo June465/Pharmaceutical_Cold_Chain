@@ -1,0 +1,13 @@
+# node/.dockerignore
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Local virtual environment
+venv/
+.venv/
+env/
+
+# Local data folder (should not be part of the image)
+data/
