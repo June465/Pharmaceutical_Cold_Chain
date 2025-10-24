@@ -1,78 +1,94 @@
+version: '3.8'
+
+networks:
+  pharma-net:
+    driver: bridge
+
 services:
-  # --- Blockchain Validator Nodes ---
   node1:
     build:
       context: ../node
     container_name: node1
     hostname: node1
-    ports:
-      - "8001:8000" 
-    volumes: 
+    volumes:
       - ../data/node1:/app/data
     environment:
       - NODE_ID=node1
       - PORT=8000
+      - PEERS=http://node2:8000,http://node3:8000,http://node4:8000
+    ports:
+      - "8001:8000"
+    networks: 
+      - pharma-net
 
   node2:
     build:
       context: ../node
     container_name: node2
     hostname: node2
-    ports:
-      - "8002:8000"
-    volumes: 
+    volumes:
       - ../data/node2:/app/data
     environment:
       - NODE_ID=node2
       - PORT=8000
+      - PEERS=http://node1:8000,http://node3:8000,http://node4:8000
+    ports:
+      - "8002:8000"
+    networks:
+      - pharma-net
 
   node3:
     build:
       context: ../node
     container_name: node3
     hostname: node3
-    ports:
-      - "8003:8000"
     volumes:
       - ../data/node3:/app/data
     environment:
       - NODE_ID=node3
       - PORT=8000
+      - PEERS=http://node1:8000,http://node2:8000,http://node4:8000
+    ports:
+      - "8003:8000"
+    networks:
+      - pharma-net
 
   node4:
     build:
       context: ../node
     container_name: node4
     hostname: node4
-    ports:
-      - "8004:8000"
     volumes:
       - ../data/node4:/app/data
     environment:
       - NODE_ID=node4
       - PORT=8000
-  
-  # --- IoT Simulator ---
+      - PEERS=http://node1:8000,http://node2:8000,http://node3:8000
+    ports:
+      - "8004:8000"
+    networks:
+      - pharma-net
+      
   simulator:
     build:
       context: ../simulator
     container_name: simulator
     hostname: simulator
     environment:
-      # In the future, this will point to one of the nodes
       - NODE_URL=http://node1:8000
-    # This makes the simulator wait for node1 to be healthy before starting
     depends_on:
       - node1
+    networks:
+      - pharma-net
 
-  # --- Web-based Explorer ---
   explorer:
     build:
       context: ../explorer
     container_name: explorer
     hostname: explorer
     ports:
-      - "3001:3000" # Expose React app on host port 3000
-    # This makes the explorer wait for node1 to be healthy before starting
+      - "3001:3000"
     depends_on:
       - node1
+    networks:
+      - pharma-net
