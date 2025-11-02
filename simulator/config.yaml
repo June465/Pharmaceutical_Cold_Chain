@@ -1,0 +1,32 @@
+# simulator/config.yaml
+
+# The URL of the blockchain node the simulator will send transactions to.
+# This can be overridden by the NODE_URL environment variable in docker-compose.yml.
+node_url: "http://node1:5000"
+
+# The private key for the wallet that will be signing and sending transactions.
+# This key was generated for demonstration purposes. 
+# It's recommended to generate your own for a real deployment.
+simulator_private_key: "2b48902517198331599399899981883659223146914594695922037222391269"
+
+# The address of the deployed PharmaContract.
+# IMPORTANT: You must deploy the contract first (see instructions below)
+# and then replace this placeholder with the actual contract address.
+contract_address: "auto-detect"
+
+# Parameters for the simulation logic
+simulation:
+  # A fictional shipment ID for tracking
+  shipment_id: "SH-451-B7"
+  
+  # The mean temperature for the simulation (in Celsius)
+  normal_temp: 4.0
+  
+  # The standard deviation for temperature fluctuations
+  temp_std_dev: 0.5
+  
+  # The chance (e.g., 0.1 = 10%) of a random temperature breach event
+  breach_chance: 0.1
+  
+  # The number of seconds between each temperature reading
+  interval_seconds: 15

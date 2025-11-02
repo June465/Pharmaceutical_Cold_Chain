@@ -19,22 +19,26 @@ class Block:
         self.header = {
             "index": index,
             "prevHash": prev_hash,
-            "merkleRoot": self.calculate_merkle_root(),
+            "merkleRoot": self.compute_merkle_root(), # <-- RENAMED for consistency
+            "stateRoot": None, # <-- ADDED: Placeholder for the state root from the VM
             "timestamp": timestamp or int(time.time()),
             "proposerId": proposer_id
         }
         self.hash = block_hash or self.compute_hash()
 
-    def calculate_merkle_root(self) -> str:
+    def compute_merkle_root(self) -> str: # <-- RENAMED: This is the primary fix for the error
         """Calculates the Merkle root of the block's transactions."""
         tx_hashes = [tx.hash for tx in self.transactions]
         return build_merkle_root(tx_hashes)
 
     def compute_hash(self) -> str:
         """Computes the hash of the block header."""
-        # We use json.dumps with sorted_keys for a deterministic hash
         header_string = json.dumps(self.header, sort_keys=True)
         return hash_data(header_string).hex()
+    
+    def recompute_hash(self): # <-- ADDED: A helper method for when the header changes
+        """Re-calculates the block's hash. Needed after state root is added."""
+        self.hash = self.compute_hash()
     
     def to_dict(self) -> Dict:
         """Serializes the block to a dictionary."""
@@ -49,16 +53,19 @@ class Block:
         """Deserializes a dictionary into a Block object."""
         transactions = []
         for tx_data in data['transactions']:
-            transactions.append(Transaction(
-                sender=tx_data['from'], 
-                to=tx_data['to'],
-                amount=tx_data['amount'],
-                nonce=tx_data['nonce'],
+            # Create a full Transaction object from the dictionary
+            tx = Transaction.from_dict(tx_data) if hasattr(Transaction, 'from_dict') else Transaction(
+                sender=tx_data.get('from'), 
+                to=tx_data.get('to'),
+                amount=tx_data.get('amount'),
+                nonce=tx_data.get('nonce'),
                 data=tx_data.get('data', ""),
-                timestamp=tx_data['timestamp'],
-                signature=tx_data['signature'],
-                tx_hash=tx_data['hash'] 
-            ))
+                timestamp=tx_data.get('timestamp'),
+                signature=tx_data.get('signature'),
+                tx_hash=tx_data.get('hash')
+            )
+            transactions.append(tx)
+
         block = cls(
             index=data['header']['index'],
             prev_hash=data['header']['prevHash'],
@@ -67,4 +74,6 @@ class Block:
             timestamp=data['header']['timestamp'],
             block_hash=data['hash']
         )
+        # Manually set the state root if it exists in the data
+        block.header['stateRoot'] = data['header'].get('stateRoot')
         return block

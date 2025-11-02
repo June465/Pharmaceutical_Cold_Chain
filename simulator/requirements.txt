@@ -1,0 +1,6 @@
+# simulator/requirements.txt
+requests
+pyyaml
+rlp
+ecdsa
+pycryptodome

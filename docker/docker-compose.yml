@@ -1,56 +1,66 @@
+# docker/docker-compose.yml
+version: '3.8'
+
 services:
-  # --- Blockchain Validator Nodes ---
+  # --- Blockchain Validator Nodes (Now consistent) ---
   node1:
     build:
       context: ../node
     container_name: node1
     hostname: node1
     ports:
-      - "8001:8000" 
-    volumes: 
-      - ../data/node1:/app/data
+      - "5000:8000" # Expose node1 to the host machine for API calls
+    volumes:
+      - node1-data:/app/db_data # Use the named volume
     environment:
+      - FLASK_RUN_PORT=8000
       - NODE_ID=node1
-      - PORT=8000
+      - PEERS=node2,node3,node4
+    networks:
+      - pharma-net
 
   node2:
     build:
       context: ../node
     container_name: node2
     hostname: node2
-    ports:
-      - "8002:8000"
+    # No ports exposed to host, they communicate over the internal network
     volumes: 
-      - ../data/node2:/app/data
+      - node2-data:/app/db_data # Use the named volume
     environment:
+      - FLASK_RUN_PORT=8000
       - NODE_ID=node2
-      - PORT=8000
+      - PEERS=node1,node3,node4
+    networks:
+      - pharma-net
 
   node3:
     build:
       context: ../node
     container_name: node3
     hostname: node3
-    ports:
-      - "8003:8000"
     volumes:
-      - ../data/node3:/app/data
+      - node3-data:/app/db_data # Use the named volume
     environment:
+      - FLASK_RUN_PORT=8000
       - NODE_ID=node3
-      - PORT=8000
+      - PEERS=node1,node2,node4
+    networks:
+      - pharma-net
 
   node4:
     build:
       context: ../node
     container_name: node4
     hostname: node4
-    ports:
-      - "8004:8000"
     volumes:
-      - ../data/node4:/app/data
+      - node4-data:/app/db_data # Use the named volume
     environment:
+      - FLASK_RUN_PORT=8000
       - NODE_ID=node4
-      - PORT=8000
+      - PEERS=node1,node2,node3
+    networks:
+      - pharma-net
   
   # --- IoT Simulator ---
   simulator:
@@ -58,12 +68,14 @@ services:
       context: ../simulator
     container_name: simulator
     hostname: simulator
+    # --- ADD THIS LINE ---
+    #command: ["sleep", "3600"] # This effectively pauses the container for an hour
     environment:
-      # In the future, this will point to one of the nodes
       - NODE_URL=http://node1:8000
-    # This makes the simulator wait for node1 to be healthy before starting
     depends_on:
       - node1
+    networks:
+      - pharma-net
 
   # --- Web-based Explorer ---
   explorer:
@@ -72,7 +84,22 @@ services:
     container_name: explorer
     hostname: explorer
     ports:
-      - "3001:3000" # Expose React app on host port 3000
-    # This makes the explorer wait for node1 to be healthy before starting
+      - "3001:3000" # Expose React app on host port 3001
     depends_on:
       - node1
+    networks:
+      - pharma-net
+
+# --- Top-level network definition ---
+networks:
+  pharma-net:
+    driver: bridge
+
+# --- Top-level volume definitions ---
+# This section was missing, which caused your error.
+# It tells Docker to create and manage these persistent storage volumes.
+volumes:
+  node1-data:
+  node2-data:
+  node3-data:
+  node4-data:

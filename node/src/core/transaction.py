@@ -86,7 +86,9 @@ class Transaction:
         Computes the final hash of the transaction, including the signature.
         This hash uniquely identifies the transaction.
         """
-        # Use RLP encoding on the full transaction data for the final hash
+        
+        signature_for_hash = self.signature or "" # Use signature if it exists, else use empty string
+
         full_tx_list = [
             self.nonce,
             self.sender.encode('utf-8'),
@@ -94,8 +96,9 @@ class Transaction:
             self.amount,
             self.data.encode('utf-8'),
             self.timestamp,
-            self.signature.encode('utf-8')
+            signature_for_hash.encode('utf-8') # This is now safe
         ]
+        
         encoded_tx = rlp.encode(full_tx_list)
         tx_hash_bytes = hash_data(encoded_tx.hex())
         return tx_hash_bytes.hex()
