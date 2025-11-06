@@ -286,3 +286,51 @@ button:disabled {
   text-decoration: none;
   font-weight: bold;
 }
+
+/* --- Styles for the new ShipmentHistory component --- */
+.history-container {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.history-row {
+  padding: 12px;
+  background-color: var(--color-bg-deep);
+  border-top: 1px solid var(--color-border);
+}
+.history-container > div:first-child {
+  border-top: none;
+}
+
+.history-row-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+}
+
+.history-row-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+  font-family: var(--font-family-mono);
+}
+.history-row-details a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+.pill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+}
+.pill.created { background-color: #00aaff; }
+.pill.transferred { background-color: #fca311; }
+.pill.delivered { background-color: #52b788; }

@@ -52,7 +52,7 @@ export async function myRoles(addr) {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 export async function getLogsChunked({ address, topics, fromBlock, toBlock }) {
-  let chunk = 8;
+  let chunk = 9;
   let from = fromBlock;
   const out = [];
 
@@ -114,6 +114,68 @@ export async function fetchReadingsFromLogs(shipmentId) {
     });
   } catch (e) {
     console.error(`Failed to fetch readings for ${shipmentId}`, e);
+    return [];
+  }
+}
+
+export async function fetchLifecycleEvents(shipmentId) {
+  try {
+    const key = ethers.keccak256(ethers.toUtf8Bytes(shipmentId));
+    const currentBlock = await httpProvider.getBlockNumber();
+    const LOOKBACK = 10000;
+    const startBlock = Math.max(currentBlock - LOOKBACK, 0);
+
+    const createdTopic = contract.interface.getEvent('ShipmentCreated').topicHash;
+    const transferTopic = contract.interface.getEvent('CustodyTransferred').topicHash;
+    const deliveredTopic = contract.interface.getEvent('Delivered').topicHash;
+
+    const [createdLogs, transferLogs, deliveredLogs] = await Promise.all([
+      getLogsChunked({ address: contract.target, topics: [createdTopic, key], fromBlock: startBlock, toBlock: currentBlock }),
+      getLogsChunked({ address: contract.target, topics: [transferTopic, key], fromBlock: startBlock, toBlock: currentBlock }),
+      getLogsChunked({ address: contract.target, topics: [deliveredTopic, key], fromBlock: startBlock, toBlock: currentBlock })
+    ]);
+
+    // This is the new, robust log processing logic
+    const allEvents = [];
+
+    // Process Created Events
+    for (const log of createdLogs) {
+      const block = await httpProvider.getBlock(log.blockNumber);
+      allEvents.push({
+        type: "CREATED",
+        timestamp: block.timestamp * 1000,
+        txHash: log.transactionHash,
+        blockNumber: log.blockNumber,
+      });
+    }
+
+    // Process Transfer Events
+    for (const log of transferLogs) {
+      const block = await httpProvider.getBlock(log.blockNumber);
+      allEvents.push({
+        type: "TRANSFERRED",
+        timestamp: block.timestamp * 1000,
+        txHash: log.transactionHash,
+        blockNumber: log.blockNumber,
+      });
+    }
+    
+    // Process Delivered Events
+    for (const log of deliveredLogs) {
+      const block = await httpProvider.getBlock(log.blockNumber);
+      allEvents.push({
+        type: "DELIVERED",
+        timestamp: block.timestamp * 1000,
+        txHash: log.transactionHash,
+        blockNumber: log.blockNumber,
+      });
+    }
+
+    allEvents.sort((a, b) => a.timestamp - b.timestamp);
+
+    return allEvents;
+  } catch (e) {
+    console.error(`Failed to fetch lifecycle events for ${shipmentId}`, e);
     return [];
   }
 }

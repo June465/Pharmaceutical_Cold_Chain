@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { httpProvider } from "../services/blockchain";
+import ShipmentHistory from './ShipmentHistory';
 
 const toC = (scaled) => (scaled === undefined || scaled === null) ? 0 : Number(scaled) / 100;
 const statusMap = ["CREATED", "IN_TRANSIT", "BREACH_DETECTED", "DELIVERED"];
@@ -103,6 +104,7 @@ export default function ShipmentDetails({ shipment }) {
           );
         })}
       </div>
+      <ShipmentHistory shipmentId={shipment.shipmentId} />
     </section>
   );
 }

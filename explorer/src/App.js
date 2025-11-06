@@ -98,9 +98,6 @@ function App() {
         const shipmentIds = [...new Set(logs.map(l => String(contract.interface.parseLog(l).args[1])))].filter(id => id);
         console.log("Found unique shipment IDs:", shipmentIds);
 
-        // --- THIS IS THE FINAL FIX ---
-        // Instead of Promise.all, we use a sequential for...of loop.
-        // This ensures we only fetch data for one shipment at a time.
         for (const id of shipmentIds) {
           console.log(`Fetching full data for ${id}...`);
           await fetchShipment(id);
