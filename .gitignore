@@ -19,7 +19,7 @@
 
 # Hardhat coverage reports
 /coverage
-
+/explorer/node_modules
 .env
-
+/venv
 txt

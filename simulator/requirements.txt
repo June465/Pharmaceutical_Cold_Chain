@@ -1,6 +1,5 @@
 # simulator/requirements.txt
-requests
+web3
+python-dotenv
 pyyaml
-rlp
-ecdsa
-pycryptodome
+requests
