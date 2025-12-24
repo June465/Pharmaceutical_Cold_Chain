@@ -84,7 +84,7 @@ function App() {
       setLoading(true);
       try {
         const currentBlock = await httpProvider.getBlockNumber();
-        const LOOKBACK = 2000;
+        const LOOKBACK = 1000;
         const startBlock = Math.max(currentBlock - LOOKBACK, 0);
         const initTopic = contract.interface.getEvent('ShipmentCreated').topicHash;
 
