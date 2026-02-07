@@ -1,12 +1,336 @@
-/* explorer/src/App.css */
-.App { text-align: center; }
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.container { padding: 16px; max-width: 1100px; margin: 0 auto; }
+.App-header { padding: 16px 16px 0; text-align: center; }
+.tabs { display:flex; gap:12px; justify-content:center; margin:8px 0 16px; flex-wrap: wrap; }
+.tabs a { color:#66d9e8; text-decoration:none; padding:6px 10px; border:1px solid #1b263b; border-radius:8px; }
+.tabs a:hover { background:#102940; }
+
+.panel { background:#0d1b2a; border:1px solid #1b263b; border-radius:12px; padding:12px; margin-bottom:16px; color:#e0e1dd; }
+.row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.stack { display:flex; flex-direction:column; gap:12px; }
+input, select { background:#0d1b2a; border:1px solid #415a77; color:#e0e1dd; padding:8px; border-radius:8px; }
+button { background:#1f6feb; color:#fff; border:0; border-radius:8px; padding:8px 12px; cursor:pointer; }
+button.ghost { background:transparent; border:1px solid #415a77; color:#e0e1dd; }
+.pill { font-size:12px; padding:2px 6px; border:1px solid #415a77; border-radius:999px; margin-left:8px; }
+.scroll { max-height:320px; overflow:auto; }
+.wallet-info {
+  margin-bottom: 16px;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}/* --- GLOBAL STYLES & COLOR PALETTE --- */
+:root {
+  --color-bg-deep: #0a111a;
+  --color-bg-panel: #0d1b2a;
+  --color-bg-panel-hover: #122339;
+  --color-border: #1b263b;
+  --color-border-strong: #415a77;
+  --color-text-primary: #e0e1dd;
+  --color-text-secondary: #a9b3c2;
+  --color-accent-primary: #00aaff;
+  --color-accent-secondary: #00f5d4;
+  --color-accent-red: #e63946;
+  --color-accent-green: #52b788;
+  --font-family-sans: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Fira Code', 'Consolas', 'Monaco', monospace;
 }
+
+body {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- LAYOUT --- */
+.App {
+  text-align: center;
+}
+.App-header {
+  padding: 24px;
+  background-color: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-border);
+}
+.container {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.stack {
+  display: grid;
+  gap: 24px;
+}
+
+/* --- CORE COMPONENTS --- */
+.panel {
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+.tabs a {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease-in-out;
+}
+.tabs a:hover {
+  background-color: var(--color-bg-panel-hover);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.tabs a.active {
+  background-color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: #fff;
+  font-weight: bold;
+}
+
+.wallet-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+}
+.wallet-info {
+  margin-bottom: 24px;
+  display: grid;
+  gap: 8px;
+}
+.wallet-info div strong {
+  color: var(--color-text-secondary);
+}
+
+/* --- FORMS & BUTTONS --- */
+.field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.field-group {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+.field-group-horizontal {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+input, select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-family: var(--font-family-mono);
+}
+input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-bg-panel-hover);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+button:hover:not(:disabled) {
+  background-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.button-primary {
+  background-color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: #fff;
+}
+.button-primary:hover:not(:disabled) {
+  background-color: #0095e0;
+}
+.status-text {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--color-bg-deep);
+  font-family: var(--font-family-mono);
+}
+
+/* --- SPECIFIC COMPONENT STYLES --- */
+.subtle {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0;
+}
+.warning {
+  border-color: var(--color-accent-red);
+  background-color: rgba(230, 57, 70, 0.1);
+}
+.warning strong {
+  color: var(--color-accent-red);
+}
+
+/* Shipment Details List */
+.readings-list-container {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.reading-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-bg-deep);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-family-mono);
+  font-size: 0.95rem;
+}
+.reading-row:first-child {
+  border-top: none;
+}
+.reading-row strong {
+  color: var(--color-accent-secondary);
+}
+
+.reading-button {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  padding: 10px 12px;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  color: inherit;
+  font-family: var(--font-family-mono);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+.readings-list-container > div:first-child .reading-button,
+.readings-list-container > button:first-of-type {
+  border-top: none;
+}
+.reading-button:hover {
+  background: var(--color-bg-panel-hover) !important;
+}
+
+.details-box {
+  background-color: #0c1624;
+  padding: 12px;
+  font-family: monospace;
+  word-break: break-all;
+  border-top: 1px solid var(--color-border);
+}
+.details-box p {
+  margin: 6px 0;
+}
+.details-box hr {
+  border-color: #415a77;
+  margin: 8px 0;
+  border-style: dashed;
+}
+.details-box a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+/* ... (your existing styles) ... */
+
+/* New styles for the Lifecycle/Custody Chain display */
+.lifecycle-container {
+  display: grid;
+  gap: 12px;
+  background-color: var(--color-bg-deep);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+.lifecycle-event {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-family-mono);
+  font-size: 0.9rem;
+}
+.lifecycle-event a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* --- Styles for the new ShipmentHistory component --- */
+.history-container {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.history-row {
+  padding: 12px;
+  background-color: var(--color-bg-deep);
+  border-top: 1px solid var(--color-border);
+}
+.history-container > div:first-child {
+  border-top: none;
+}
+
+.history-row-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: bold;
+}
+
+.history-row-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+  font-family: var(--font-family-mono);
+}
+.history-row-details a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+}
+
+.pill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+}
+.pill.created { background-color: #00aaff; }
+.pill.transferred { background-color: #fca311; }
+.pill.delivered { background-color: #52b788; }

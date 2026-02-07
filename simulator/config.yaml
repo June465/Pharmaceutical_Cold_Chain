@@ -1,0 +1,17 @@
+# simulator/config.yaml
+# General simulation parameters. Secret keys have been moved to .env
+
+simulation:
+  shipment_id: "SHIP-102"
+  
+  # The mean temperature for the simulation (in Celsius)
+  normal_temp: 4.0
+  
+  # The standard deviation for temperature fluctuations
+  temp_std_dev: 0.5
+  
+  # The chance (e.g., 0.1 = 10%) of a random temperature breach event
+  breach_chance: 0.1
+  
+  # The number of seconds between each temperature reading
+  interval_seconds: 30 # Increased to allow time for block confirmation

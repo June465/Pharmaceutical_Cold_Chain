@@ -1,0 +1,5 @@
+# simulator/requirements.txt
+web3
+python-dotenv
+pyyaml
+requests
